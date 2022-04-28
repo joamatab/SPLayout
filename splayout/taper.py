@@ -42,10 +42,7 @@ class Taper():
         self.z_end = z_end
         self.material = material
         self.rename = rename
-        if (start_point == end_point):
-            self.ifexist = 0
-        else:
-            self.ifexist = 1
+        self.ifexist = 0 if (start_point == end_point) else 1
         if start_point.x == end_point.x:  ## vertical taper
             # if (math.fabs(start_point.y - end_point.y) < 5):
             #     raise Exception("Taper Too Short!")
@@ -105,10 +102,10 @@ class Taper():
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        taper_pts = [(self.down_left_x, self.down_left_y), (self.down_right_x, self.down_right_y),
-                     (self.up_right_x, self.up_right_y), (self.up_left_x, self.up_left_y)]
-        if (self.ifexist):
-            if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
+        if self.ifexist:
+            taper_pts = [(self.down_left_x, self.down_left_y), (self.down_right_x, self.down_right_y),
+                         (self.up_right_x, self.up_right_y), (self.up_left_x, self.up_left_y)]
+            if type(engine) in [FDTDSimulation, MODESimulation]:
                 if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
                     engine.put_polygon(tuple_list = taper_pts,
                                        z_start = self.z_start,

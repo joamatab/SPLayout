@@ -96,7 +96,7 @@ class Point:
         """
         return Point( self.x + (others.x - self.x)*percent,  self.y+ (others.y - self.y)*percent)
 
-    def get_relative_radian(self,other): ## ! -pi to pi
+    def get_relative_radian(self,other):    ## ! -pi to pi
         """
         Derive the relative radian with another point as a circle center point.
 
@@ -110,8 +110,7 @@ class Point:
         out : float
             The desired radian (radian,  -pi to pi).
         """
-        radian = math.atan( (self.y - other.y)/(self.x - other.x))
-        return radian
+        return math.atan( (self.y - other.y)/(self.x - other.x))
 
     def __add__(self, other):
         if (type(other) == Point):

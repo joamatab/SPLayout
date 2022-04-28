@@ -78,13 +78,15 @@ class AdjointForTO:
             error_term = np.trapz(y=T_fwd_error_integrand, x=wavelength)
             self.fom = const_term - error_term
         else:
+            self.multi_target_fom = []
             self.T_fwd_vs_wavelength = []
             self.phase_prefactors = []
-            forward_source_power = 0
-            self.multi_target_fom = []
-            for i in range(0, len(self.forward_source_name)):
-                forward_source_power += self.fdtd_engine.get_source_power(self.forward_source_name[i])
-            for i in range(0, len(self.target_fom)):
+            forward_source_power = sum(
+                self.fdtd_engine.get_source_power(self.forward_source_name[i])
+                for i in range(len(self.forward_source_name))
+            )
+
+            for i in range(len(self.target_fom)):
                 mode_coefficient = self.fdtd_engine.get_mode_coefficient(expansion_name=self.fom_monitor_name[i])
                 self.T_fwd_vs_wavelength.append(np.real(mode_coefficient * mode_coefficient.conj() / forward_source_power))
                 self.phase_prefactors.append(mode_coefficient / 4.0 / forward_source_power)
@@ -116,6 +118,7 @@ class AdjointForTO:
         params = np.reshape(params, (self.design_region.get_x_size(), self.design_region.get_y_size()))
         self.fdtd_engine.switch_to_layout()
         self.fdtd_engine.set_disable(self.forward_source_name)
+        const_factor = -1.0
         if (not self.multi_target_flag):
             self.fdtd_engine.set_enable(self.backward_source_name)
             self.fdtd_engine.run(self.sim_name)
@@ -138,7 +141,7 @@ class AdjointForTO:
                 dF_dEps = np.squeeze(np.sum(gradient_field, axis=-1), axis=2)
 
 
-            for wl in range(0, len(omega)):
+            for wl in range(len(omega)):
                 dF_dEps[:,:, wl] = dF_dEps[:,:, wl]*scaling_factor[wl]
 
             if (self.y_antisymmetric):
@@ -168,16 +171,14 @@ class AdjointForTO:
             wavelength = self.fdtd_engine.get_wavelength()
             wavelength_range = wavelength.max() - wavelength.min()
             T_fwd_error = self.T_fwd_vs_wavelength - self.target_fom
-            const_factor = -1.0
             integral_kernel = np.sign(T_fwd_error) / wavelength_range
             d = np.diff(wavelength)
-            quad_weight = np.append(np.append(d[0], d[0:-1] + d[1:]),
-                                    d[-1]) / 2  # < There is probably a more elegant way to do this
+            quad_weight = (np.append(np.append(d[0], d[:-1] + d[1:]), d[-1]) / 2)
             v = const_factor * integral_kernel.flatten() * quad_weight
             T_fwd_partial_derivs = partial_fom.dot(v).flatten().real
         else:
             self.grad_list = []
-            for i in range(0, len(self.target_fom)):
+            for i in range(len(self.target_fom)):
                 self.fdtd_engine.switch_to_layout()
                 self.fdtd_engine.set_disable(self.backward_source_name)
                 self.fdtd_engine.set_enable(self.backward_source_name[i])
@@ -189,7 +190,7 @@ class AdjointForTO:
                 gradient_field = 2.0 * self.design_region.x_mesh * 1e-6 * self.design_region.y_mesh * 1e-6 * scipy.constants.epsilon_0 * self.forward_field * self.adjoint_field
                 dF_dEps = np.squeeze(np.sum(gradient_field, axis=-1), axis=2)
 
-                for wl in range(0, len(omega)):
+                for wl in range(len(omega)):
                     dF_dEps[:, :, wl] = dF_dEps[:, :, wl] * scaling_factor[wl]
 
                 if (self.y_antisymmetric):
@@ -216,11 +217,9 @@ class AdjointForTO:
                 wavelength = self.fdtd_engine.get_wavelength()
                 wavelength_range = wavelength.max() - wavelength.min()
                 T_fwd_error = self.T_fwd_vs_wavelength[i] - self.target_fom[i]
-                const_factor = -1.0
                 integral_kernel = np.sign(T_fwd_error) / wavelength_range
                 d = np.diff(wavelength)
-                quad_weight = np.append(np.append(d[0], d[0:-1] + d[1:]),
-                                        d[-1]) / 2  # < There is probably a more elegant way to do this
+                quad_weight = (np.append(np.append(d[0], d[:-1] + d[1:]), d[-1]) / 2)
                 v = const_factor * integral_kernel.flatten() * quad_weight
                 T_fwd_partial_derivs = partial_fom.dot(v).flatten().real
                 self.grad_list.append(T_fwd_partial_derivs)

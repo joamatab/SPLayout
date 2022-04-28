@@ -66,23 +66,28 @@ class TopologyOptRegion2D:
         self.filter_R = filter_R
         self.eta = eta
         self.beta = beta
-        self.index_region_name = self.rename + "_index"
-        self.field_region_name = self.rename + "_field"
+        self.index_region_name = f"{self.rename}_index"
+        self.field_region_name = f"{self.rename}_field"
         self.__initialize()
         self.epsilon_figure = None
         self.field_figure = None
 
     def __initialize(self):
         self.fdtd_engine.add_index_region(self.left_down_point, self.right_up_point, z_min=self.z_min, z_max=self.z_max, dimension=2, index_monitor_name= self.index_region_name)
-        self.fdtd_engine.fdtd.eval( 'select("{}");set("spatial interpolation","specified position");'.format(self.index_region_name))
+        self.fdtd_engine.fdtd.eval(
+            f'select("{self.index_region_name}");set("spatial interpolation","specified position");'
+        )
+
         self.fdtd_engine.add_field_region(self.left_down_point, self.right_up_point, z_min=self.z_min, z_max=self.z_max, dimension=2, field_monitor_name= self.field_region_name)
         self.fdtd_engine.fdtd.eval(
-            'select("{}");set("spatial interpolation","specified position");'.format(self.field_region_name))
+            f'select("{self.field_region_name}");set("spatial interpolation","specified position");'
+        )
+
         self.fdtd_engine.add_mesh_region(self.left_down_point, self.right_up_point, x_mesh=self.x_mesh, y_mesh=self.y_mesh,
                              z_mesh=self.z_mesh, z_min=self.z_min, z_max=self.z_max)
         self.fdtd_engine.fdtd.eval('addimport;')
         self.fdtd_engine.fdtd.eval('set("detail",1);')
-        self.fdtd_engine.fdtd.eval('set("name","{}");'.format(self.rename))
+        self.fdtd_engine.fdtd.eval(f'set("name","{self.rename}");')
 
     def get_x_size(self):
         """
@@ -133,14 +138,27 @@ class TopologyOptRegion2D:
         self.fdtd_engine.fdtd.putv('y_geo', self.y_positions*1e-6)
         self.fdtd_engine.fdtd.putv('z_geo', np.array([self.z_min*1e-6, self.z_max*1e-6]))
 
-        self.fdtd_engine.fdtd.eval('select("{}");'.format(self.rename) +
-                  'delete;' +
-                  'addimport;' +
-                  'set("name","{}");'.format(self.rename) +
-                  'temp=zeros(length(x_geo),length(y_geo),2);' +
-                  'temp(:,:,1)=eps_geo;' +
-                  'temp(:,:,2)=eps_geo;' +
-                  'importnk2(sqrt(temp),x_geo,y_geo,z_geo);')
+        self.fdtd_engine.fdtd.eval(
+            (
+                (
+                    (
+                        (
+                            (
+                                (
+                                    (f'select("{self.rename}");' + 'delete;')
+                                    + 'addimport;'
+                                )
+                                + f'set("name","{self.rename}");'
+                            )
+                            + 'temp=zeros(length(x_geo),length(y_geo),2);'
+                        )
+                        + 'temp(:,:,1)=eps_geo;'
+                    )
+                    + 'temp(:,:,2)=eps_geo;'
+                )
+                + 'importnk2(sqrt(temp),x_geo,y_geo,z_geo);'
+            )
+        )
 
     def get_E_distribution(self, if_get_spatial = 0):
         """
@@ -159,13 +177,12 @@ class TopologyOptRegion2D:
             if if_get_spatial == 1: field, x mesh, y mesh, z mesh
                 size: (x mesh, y mesh, 1, frequency points, 3), (x mesh,), (y mesh,), (1,)
         """
-        if (if_get_spatial == 0):
-            self.field_figure = self.fdtd_engine.get_E_distribution(field_monitor_name=self.field_region_name,
-                                                                    if_get_spatial=if_get_spatial)
-            return self.field_figure
-        else:
+        if if_get_spatial != 0:
             return self.fdtd_engine.get_E_distribution(field_monitor_name=self.field_region_name,
                                                        if_get_spatial=if_get_spatial)
+        self.field_figure = self.fdtd_engine.get_E_distribution(field_monitor_name=self.field_region_name,
+                                                                if_get_spatial=if_get_spatial)
+        return self.field_figure
 
     def get_epsilon_distribution(self):
         """

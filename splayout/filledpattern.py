@@ -61,13 +61,12 @@ class Circle:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                self.bend.draw_on_lumerical_CAD(engine)
-            else:
-                raise Exception("Z-axis specification or material specification is missing!")
-        else:
+        if type(engine) not in [FDTDSimulation, MODESimulation]:
             raise Exception("Wrong CAD engine!")
+        if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+            self.bend.draw_on_lumerical_CAD(engine)
+        else:
+            raise Exception("Z-axis specification or material specification is missing!")
 
     def get_center_point(self):
         """
@@ -106,11 +105,7 @@ class Rectangle:
     def __init__(self, center_point, width, height = None, z_start = None, z_end = None, material = None, rename = None):
         self.center_point = tuple_to_point(center_point)
         self.width = width
-        if (height == None):
-            self.height = width
-        else:
-            self.height = height
-
+        self.height = width if height is None else height
         self.z_start = z_start
         self.z_end = z_end
         self.material = material
@@ -146,13 +141,12 @@ class Rectangle:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                self.waveguide.draw_on_lumerical_CAD(engine)
-            else:
-                raise Exception("Z-axis specification or material specification is missing!")
-        else:
+        if type(engine) not in [FDTDSimulation, MODESimulation]:
             raise Exception("Wrong CAD engine!")
+        if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+            self.waveguide.draw_on_lumerical_CAD(engine)
+        else:
+            raise Exception("Z-axis specification or material specification is missing!")
 
     def get_center_point(self):
         """

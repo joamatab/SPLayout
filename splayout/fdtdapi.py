@@ -125,7 +125,7 @@ class FDTDSimulation:
         If use update_mode the monitor should be put after adding fdtd region and mesh region.
         """
         position = tuple_to_point(position)
-        power_monitor_name = expansion_name + "_expansion"
+        power_monitor_name = f"{expansion_name}_expansion"
         self.add_power_monitor(position,width = width,height=height,monitor_name=power_monitor_name ,points=points)
         self.fdtd.eval("addmodeexpansion;")
         self.fdtd.eval("set(\"name\",\"" + expansion_name + "\");")
@@ -541,7 +541,7 @@ class FDTDSimulation:
         wavelength = np.reshape(wavelength, (wavelength.shape[0]))
         transmission = self.lumapi.getVar(self.fdtd.handle, varname="mode_transmission").T
         spectrum = np.zeros((transmission.shape[0], 2, transmission.shape[1]))
-        for i in range(0, transmission.shape[0]):
+        for i in range(transmission.shape[0]):
             spectrum[i, 0, :] = wavelength
             spectrum[i, 1, :] = transmission[i, :]
         if (datafile != None):
@@ -677,12 +677,10 @@ class FDTDSimulation:
         -----
         This function should be called after setting the wavelength range in source and the frequency points in any frequency domain monitor.
         """
-        if self.global_source_set_flag  and self.global_monitor_set_flag:
-            wavelength = np.linspace(self.wavelength_start, self.wavelength_end, self.frequency_points,endpoint=True)
-            frequency = scipy.constants.speed_of_light / wavelength
-        else:
+        if not self.global_source_set_flag or not self.global_monitor_set_flag:
             raise Exception("The source is not well defined!")
-        return frequency
+        wavelength = np.linspace(self.wavelength_start, self.wavelength_end, self.frequency_points,endpoint=True)
+        return scipy.constants.speed_of_light / wavelength
 
     def get_omega(self):
         """
@@ -697,12 +695,10 @@ class FDTDSimulation:
         -----
         This function should be called after setting the wavelength range in source and the frequency points in any frequency domain monitor.
         """
-        if self.global_source_set_flag  and self.global_monitor_set_flag:
-            wavelength = np.linspace(self.wavelength_start, self.wavelength_end, self.frequency_points)
-            omega = 2.0 * np.pi * scipy.constants.speed_of_light / wavelength
-        else:
+        if not self.global_source_set_flag or not self.global_monitor_set_flag:
             raise Exception("The source is not well defined!")
-        return omega
+        wavelength = np.linspace(self.wavelength_start, self.wavelength_end, self.frequency_points)
+        return 2.0 * np.pi * scipy.constants.speed_of_light / wavelength
 
 
     def get_epsilon_distribution(self,index_monitor_name="index", data_name = "index_data",  datafile = None):
@@ -911,8 +907,8 @@ class FDTDSimulation:
         else:
             string = "["
             for item in list[:-1]:
-                string += str(item) + ","
-            string += str(list[-1]) + "]"
+                string += f"{str(item)},"
+            string += f"{str(list[-1])}]"
         return string
 
     @staticmethod
@@ -1033,9 +1029,7 @@ class FDTDSimulation:
                 tuple_list.append(item.to_tuple())
             elif type(item) == tuple:
                 tuple_list.append(item)
-            elif type(item) == list:
-                tuple_list.append(tuple(item))
-            elif type(item) == np.ndarray:
+            elif type(item) in [list, np.ndarray]:
                 tuple_list.append(tuple(item))
             else:
                 raise Exception("Polygon Wrong Type Input!")

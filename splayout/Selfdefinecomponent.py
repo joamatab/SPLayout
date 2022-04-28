@@ -75,32 +75,31 @@ def MAKE_COMPONENT(filename,rename=None,relative_start_point=Point(0,0),relative
         def __init__(self, start_point, relative_position=RIGHT):
             self.rotate_radian = int(relative_position - initial_relative_position + 360) % 360
             self.count = SelfDefineCount_local
-            if (type(relative_start_point) != type(None)):
-                if (self.rotate_radian == RIGHT):
-                    self.start_point = tuple_to_point(start_point) - relative_start_point
-                    self.start_point_for_return = self.start_point + relative_start_point
-                elif (self.rotate_radian == UP):
-                    self.start_point = tuple_to_point(start_point) - relative_start_point - Point(
-                        -relative_start_point.y,
-                        relative_start_point.x) * 2
-                    self.start_point_for_return = self.start_point + Point(-relative_start_point.y,
-                                                                           relative_start_point.x)
-                elif (self.rotate_radian == LEFT):
-                    self.start_point = tuple_to_point(start_point) - relative_start_point - Point(
-                        -relative_start_point.x,
-                        -relative_start_point.y) * 2
-                    self.start_point_for_return = self.start_point + Point(-relative_start_point.x,
-                                                                           -relative_start_point.y)
-                elif (self.rotate_radian == DOWN):
-                    self.start_point = tuple_to_point(start_point) - relative_start_point - Point(
-                        relative_start_point.y,
-                        -relative_start_point.x) * 2
-                    self.start_point_for_return = self.start_point + Point(relative_start_point.y,
-                                                                           -relative_start_point.x)
-                else:
-                    raise Exception("Wrong relative position!")
-            else:
+            if type(relative_start_point) == type(None):
                 self.start_point_for_return = None
+            elif (self.rotate_radian == RIGHT):
+                self.start_point = tuple_to_point(start_point) - relative_start_point
+                self.start_point_for_return = self.start_point + relative_start_point
+            elif (self.rotate_radian == UP):
+                self.start_point = tuple_to_point(start_point) - relative_start_point - Point(
+                    -relative_start_point.y,
+                    relative_start_point.x) * 2
+                self.start_point_for_return = self.start_point + Point(-relative_start_point.y,
+                                                                       relative_start_point.x)
+            elif (self.rotate_radian == LEFT):
+                self.start_point = tuple_to_point(start_point) - relative_start_point - Point(
+                    -relative_start_point.x,
+                    -relative_start_point.y) * 2
+                self.start_point_for_return = self.start_point + Point(-relative_start_point.x,
+                                                                       -relative_start_point.y)
+            elif (self.rotate_radian == DOWN):
+                self.start_point = tuple_to_point(start_point) - relative_start_point - Point(
+                    relative_start_point.y,
+                    -relative_start_point.x) * 2
+                self.start_point_for_return = self.start_point + Point(relative_start_point.y,
+                                                                       -relative_start_point.x)
+            else:
+                raise Exception("Wrong relative position!")
             if (type(relative_end_point) != type(None)):
                 relative_end_point_transfer = relative_end_point
                 if (self.rotate_radian == RIGHT):

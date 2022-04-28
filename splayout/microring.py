@@ -41,7 +41,10 @@ class AddDropMicroringFlat:
         self.default_bend_radius = 5
 
         global add_drop_microring_flat_number
-        self.temp_cell = Cell("AddDropMicroringFlat" + str(add_drop_microring_flat_number))
+        self.temp_cell = Cell(
+            f"AddDropMicroringFlat{str(add_drop_microring_flat_number)}"
+        )
+
         add_drop_microring_flat_number += 1
 
 

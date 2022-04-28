@@ -101,15 +101,14 @@ class AQuarBend:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                self.first_waveguide.draw_on_lumerical_CAD(engine)
-                self.center_bend.draw_on_lumerical_CAD(engine)
-                self.second_waveguide.draw_on_lumerical_CAD(engine)
-            else:
-                raise Exception("Z-axis specification or material specification is missing!")
-        else:
+        if type(engine) not in [FDTDSimulation, MODESimulation]:
             raise Exception("Wrong CAD engine!")
+        if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+            self.first_waveguide.draw_on_lumerical_CAD(engine)
+            self.center_bend.draw_on_lumerical_CAD(engine)
+            self.second_waveguide.draw_on_lumerical_CAD(engine)
+        else:
+            raise Exception("Z-axis specification or material specification is missing!")
 
     def get_start_point(self):
         """
@@ -229,15 +228,14 @@ class QuarBend:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                self.first_waveguide.draw_on_lumerical_CAD(engine)
-                self.center_bend.draw_on_lumerical_CAD(engine)
-                self.second_waveguide.draw_on_lumerical_CAD(engine)
-            else:
-                raise Exception("Z-axis specification or material specification is missing!")
-        else:
+        if type(engine) not in [FDTDSimulation, MODESimulation]:
             raise Exception("Wrong CAD engine!")
+        if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+            self.first_waveguide.draw_on_lumerical_CAD(engine)
+            self.center_bend.draw_on_lumerical_CAD(engine)
+            self.second_waveguide.draw_on_lumerical_CAD(engine)
+        else:
+            raise Exception("Z-axis specification or material specification is missing!")
 
     def get_start_point(self):
         """

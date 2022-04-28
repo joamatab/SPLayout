@@ -117,8 +117,9 @@ class AdjointForShapeOpt:
                 forward_field_name) +
             "    }" +
             "}")
-        partial_fom = fdtd_engine.lumapi.getVar(fdtd_engine.fdtd.handle, 'partial_fom_derivs_vs_lambda')
-        return partial_fom
+        return fdtd_engine.lumapi.getVar(
+            fdtd_engine.fdtd.handle, 'partial_fom_derivs_vs_lambda'
+        )
 
     def call_fom(self, params):
         """
@@ -199,7 +200,7 @@ class AdjointForShapeOpt:
 
         d = np.diff(wavelength)
 
-        quad_weight = np.append(np.append(d[0], d[0:-1] + d[1:]), d[-1]) / 2
+        quad_weight = np.append(np.append(d[0], d[:-1] + d[1:]), d[-1]) / 2
         v = const_factor * integral_kernel.flatten() * quad_weight
         T_fwd_partial_derivs = partial_fom.transpose().dot(v).flatten().real
         return - T_fwd_partial_derivs / 1e6

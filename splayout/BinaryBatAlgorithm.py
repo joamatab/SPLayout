@@ -60,7 +60,7 @@ class BinaryBatAlgorithm:
         """
         Initialize the Binary Bat Algorithm, evaluate the first iteration.
         """
-        for i in range(0, self.noS):
+        for i in range(self.noS):
             self.__fitness[i] = self.cost_function(self.__Sol[i, :])
         self.min_fitness = np.min(self.__fitness, axis=0)[0]
         self.__min_position = np.argmin(self.__fitness, axis=0)[0]
@@ -79,10 +79,10 @@ class BinaryBatAlgorithm:
         while (self.__iter < self.max_iteration):
             self.cg_curve[self.__iter] = self.min_fitness
             self.__iter += 1
-            for i in range(0,self.noS):
+            for i in range(self.noS):
                 ## create a temporal solution
                 temp_solution = self.__Sol[i,:]
-                for j in range(0,self.loS):
+                for j in range(self.loS):
                     self.__Q[i] = self.__Qmin + (self.__Qmin - self.__Qmax)*np.random.rand() # Equation 3
                     self.__v[i,j] = self.__v[i,j] + (temp_solution[j] - self.best_solution[j]) * self.__Q[i] # Equation 1
 

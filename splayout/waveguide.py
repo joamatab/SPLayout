@@ -42,10 +42,7 @@ class Waveguide:
         self.z_end = z_end
         self.material = material
         self.rename = rename
-        if (start_point == end_point):
-            self.ifexist = 0
-        else:
-            self.ifexist = 1
+        self.ifexist = 0 if (start_point == end_point) else 1
         if start_point.x == end_point.x:  ## vertical waveguide
             self.down_left_x = start_point.x - width / 2
             self.down_left_y = start_point.y if (start_point.y < end_point.y) else end_point.y
@@ -90,14 +87,13 @@ class Waveguide:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if (self.ifexist):
-            if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-                if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                    engine.put_rectangle((self.down_left_x, self.down_left_y), (self.up_right_x, self.up_right_y), self.z_start, self.z_end, self.material, self.rename)
-                else:
-                    raise Exception("Z-axis specification or material specification is missing!")
-            else:
+        if self.ifexist:
+            if type(engine) not in [FDTDSimulation, MODESimulation]:
                 raise Exception("Wrong CAD engine!")
+            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+                engine.put_rectangle((self.down_left_x, self.down_left_y), (self.up_right_x, self.up_right_y), self.z_start, self.z_end, self.material, self.rename)
+            else:
+                raise Exception("Z-axis specification or material specification is missing!")
 
 
     def get_start_point(self):
@@ -197,14 +193,13 @@ class ArbitraryAngleWaveguide:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if (self.ifexist):
-            if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-                if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                    self.waveguide.draw_on_lumerical_CAD(engine)
-                else:
-                    raise Exception("Z-axis specification or material specification is missing!")
-            else:
+        if self.ifexist:
+            if type(engine) not in [FDTDSimulation, MODESimulation]:
                 raise Exception("Wrong CAD engine!")
+            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+                self.waveguide.draw_on_lumerical_CAD(engine)
+            else:
+                raise Exception("Z-axis specification or material specification is missing!")
 
     def get_start_point(self):
         """

@@ -57,8 +57,8 @@ class DirectBianrySearchAlgorithm:
         Run the DBS engine.
         """
         while (self.__iter < self.max_iteration):
-            self.__undisturbed = np.array(range(0, self.loS))
-            for i in range(0,self.loS):
+            self.__undisturbed = np.array(range(self.loS))
+            for i in range(self.loS):
                 temp_solution = self.__Sol.copy()
                 perturbate_shuffle = np.random.randint(0,self.__undisturbed.size)
                 perturbate_position = self.__undisturbed[perturbate_shuffle]

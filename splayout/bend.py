@@ -82,16 +82,15 @@ class Bend:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                engine.put_round(self.center_point, inner_radius = self.radius - self.width/2,
-                                 outer_radius = self.radius + self.width/2,
-                                 start_radian = self.start_radian,
-                                 end_radian = self.end_radian, z_start=self.z_start, z_end= self.z_end, material= self.material, rename = self.rename)
-            else:
-                raise Exception("Z-axis specification or material specification is missing!")
-        else:
+        if type(engine) not in [FDTDSimulation, MODESimulation]:
             raise Exception("Wrong CAD engine!")
+        if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+            engine.put_round(self.center_point, inner_radius = self.radius - self.width/2,
+                             outer_radius = self.radius + self.width/2,
+                             start_radian = self.start_radian,
+                             end_radian = self.end_radian, z_start=self.z_start, z_end= self.z_end, material= self.material, rename = self.rename)
+        else:
+            raise Exception("Z-axis specification or material specification is missing!")
 
     def get_start_point(self):
         """

@@ -39,7 +39,44 @@ class SBend:
         self.z_end = z_end
         self.material = material
         self.rename = rename
-        if (length != None and radius != None): # overwrite the properties of S-Bend
+        if length is None or radius is None:
+            self.start_point = tuple_to_point(start_point)
+            self.end_point = tuple_to_point(end_point)
+            self.width = width
+
+            ## calculate radius and radian
+            self.delta_x = abs(self.start_point.x - end_point.x)
+            self.delta_y = abs(self.start_point.y - end_point.y)
+
+            self.theta = (
+                math.atan(self.delta_y / self.delta_x)
+                if (
+                    self.start_point.x > end_point.x
+                    and self.start_point.y > end_point.y
+                )
+                or (
+                    self.start_point.x < end_point.x
+                    and self.start_point.y < end_point.y
+                )
+                else math.atan(self.delta_x / self.delta_y)
+            )
+
+            self.radian = math.pi - 2 * self.theta
+            self.radius = math.sin(self.theta) * math.sqrt(
+                math.pow(self.delta_x / 2, 2) + math.pow(self.delta_y / 2, 2)) / math.sin(self.radian)
+            if (self.radius < 5):
+                print(
+                    (
+                        f"Warning! The radius of the bends in SBend is too small! The radius now is:{str(self.radius)}"
+                        + "μm."
+                    )
+                )
+
+            self.length = self.radian * self.radius
+
+
+
+        else: # overwrite the properties of S-Bend
             self.start_point = tuple_to_point(start_point)
             self.length = length
             self.radius = radius
@@ -61,29 +98,6 @@ class SBend:
                 self.delta_x = self.radius * math.sin(self.radian) * 2
                 self.delta_y = (self.radius - self.radius * math.cos(self.radian)) * 2
                 self.end_point = self.start_point + (-self.delta_x, self.delta_y)
-
-        else:
-            self.start_point = tuple_to_point(start_point)
-            self.end_point = tuple_to_point(end_point)
-            self.width = width
-
-            ## calculate radius and radian
-            self.delta_x = abs(self.start_point.x - end_point.x)
-            self.delta_y = abs(self.start_point.y - end_point.y)
-
-            if (self.start_point.x > end_point.x and self.start_point.y > end_point.y) or (self.start_point.x < end_point.x and self.start_point.y < end_point.y):
-                self.theta = math.atan(self.delta_y / self.delta_x)
-            else:
-                self.theta = math.atan(self.delta_x / self.delta_y)
-            self.radian = math.pi - 2 * self.theta
-            self.radius = math.sin(self.theta) * math.sqrt(
-                math.pow(self.delta_x / 2, 2) + math.pow(self.delta_y / 2, 2)) / math.sin(self.radian)
-            if (self.radius < 5):
-                print("Warning! The radius of the bends in SBend is too small! The radius now is:" + str(
-                    self.radius) + "μm.")
-            self.length = self.radian * self.radius
-
-
 
         ## identify the type of S-Bend
         if (self.start_point.x > end_point.x and self.start_point.y > end_point.y): ## left down type
@@ -144,14 +158,13 @@ class SBend:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                self.first_bend.draw_on_lumerical_CAD(engine)
-                self.second_bend.draw_on_lumerical_CAD(engine)
-            else:
-                raise Exception("Z-axis specification or material specification is missing!")
-        else:
+        if type(engine) not in [FDTDSimulation, MODESimulation]:
             raise Exception("Wrong CAD engine!")
+        if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+            self.first_bend.draw_on_lumerical_CAD(engine)
+            self.second_bend.draw_on_lumerical_CAD(engine)
+        else:
+            raise Exception("Z-axis specification or material specification is missing!")
 
     def get_start_point(self):
         """
@@ -224,7 +237,42 @@ class ASBend:
         self.z_end = z_end
         self.material = material
         self.rename = rename
-        if (length != None and radius != None):  # overwrite the properties of S-Bend
+        if length is None or radius is None:
+            self.start_point = tuple_to_point(start_point)
+            self.end_point = tuple_to_point(end_point)
+            self.width = width
+
+            ## calculate radius and radian
+            self.delta_x = abs(self.start_point.x - end_point.x)
+            self.delta_y = abs(self.start_point.y - end_point.y)
+
+            self.theta = (
+                math.atan(self.delta_y / self.delta_x)
+                if (
+                    self.start_point.x < end_point.x
+                    and self.start_point.y > end_point.y
+                )
+                or (
+                    self.start_point.x > end_point.x
+                    and self.start_point.y < end_point.y
+                )
+                else math.atan(self.delta_x / self.delta_y)
+            )
+
+            self.radian = math.pi - 2 * self.theta
+            self.radius = math.sin(self.theta) * math.sqrt(
+                math.pow(self.delta_x / 2, 2) + math.pow(self.delta_y / 2, 2)) / math.sin(self.radian)
+            if (self.radius < 5):
+                print(
+                    (
+                        f"Warning! The radius of the bends in SBend is too small! The radius now is:{str(self.radius)}"
+                        + "μm."
+                    )
+                )
+
+            self.length = self.radian * self.radius
+
+        else:  # overwrite the properties of S-Bend
             self.start_point = tuple_to_point(start_point)
             self.length = length
             self.radius = radius
@@ -247,28 +295,6 @@ class ASBend:
                 self.delta_y = self.radius * math.sin(self.radian) * 2
                 self.delta_x = (self.radius - self.radius * math.cos(self.radian)) * 2
                 self.end_point = self.start_point + (-self.delta_x, self.delta_y)
-
-        else:
-            self.start_point = tuple_to_point(start_point)
-            self.end_point = tuple_to_point(end_point)
-            self.width = width
-
-            ## calculate radius and radian
-            self.delta_x = abs(self.start_point.x - end_point.x)
-            self.delta_y = abs(self.start_point.y - end_point.y)
-
-            if (self.start_point.x < end_point.x and self.start_point.y > end_point.y) or (
-                    self.start_point.x > end_point.x and self.start_point.y < end_point.y):
-                self.theta = math.atan(self.delta_y / self.delta_x)
-            else:
-                self.theta = math.atan(self.delta_x / self.delta_y)
-            self.radian = math.pi - 2 * self.theta
-            self.radius = math.sin(self.theta) * math.sqrt(
-                math.pow(self.delta_x / 2, 2) + math.pow(self.delta_y / 2, 2)) / math.sin(self.radian)
-            if (self.radius < 5):
-                print("Warning! The radius of the bends in SBend is too small! The radius now is:" + str(
-                    self.radius) + "μm.")
-            self.length = self.radian * self.radius
 
         ## identify the type of S-Bend
         if (self.start_point.x > end_point.x and self.start_point.y > end_point.y): ## left down type
@@ -330,14 +356,13 @@ class ASBend:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                self.first_bend.draw_on_lumerical_CAD(engine)
-                self.second_bend.draw_on_lumerical_CAD(engine)
-            else:
-                raise Exception("Z-axis specification or material specification is missing!")
-        else:
+        if type(engine) not in [FDTDSimulation, MODESimulation]:
             raise Exception("Wrong CAD engine!")
+        if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+            self.first_bend.draw_on_lumerical_CAD(engine)
+            self.second_bend.draw_on_lumerical_CAD(engine)
+        else:
+            raise Exception("Z-axis specification or material specification is missing!")
 
     def get_start_point(self):
         """

@@ -26,7 +26,7 @@ from distutils.dist import Distribution
 b = distutils.command.build.build(Distribution())
 b.initialize_options()
 b.finalize_options()
-sys.path.insert(0, os.path.abspath(".." + os.sep + b.build_platlib))
+sys.path.insert(0, os.path.abspath(f"..{os.sep}{b.build_platlib}"))
 
 # -- General configuration ------------------------------------------------
 

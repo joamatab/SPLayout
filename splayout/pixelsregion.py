@@ -51,8 +51,8 @@ class CirclePixelsRegion:
         self.block_y_length = np.abs(self.left_down_point.y - self.right_up_point.y) / self.__lastest_array.shape[1]
         self.x_start_point = self.left_down_point.x + self.block_x_length/2
         self.y_start_point = self.right_up_point.y - self.block_y_length/2
-        for row in range(0, self.__lastest_array.shape[1]):
-            for col in range(0, self.__lastest_array.shape[0]):
+        for row in range(self.__lastest_array.shape[1]):
+            for col in range(self.__lastest_array.shape[0]):
                 center_point = Point(self.x_start_point+col*self.block_x_length,self.y_start_point-row*self.block_y_length)
                 radius = self.pixel_radius * self.__lastest_array[col,row]
                 if (np.isclose(radius, self.pixel_radius_th) or radius < self.pixel_radius_th):
@@ -99,7 +99,10 @@ class CirclePixelsRegion:
                     radius = 0
                 if (np.isclose(radius, self.pixel_radius) or radius > self.pixel_radius):
                     radius = self.pixel_radius
-                self.fdtd_engine.fdtd.eval('select("{}");'.format(self.group_name + str(position[0])+"_"+str(position[1])))
+                self.fdtd_engine.fdtd.eval(
+                    f'select("{self.group_name + str(position[0])+"_" + str(position[1])}");'
+                )
+
                 self.fdtd_engine.fdtd.eval('set("radius", %.6fe-6);'%(radius))
 
 
@@ -159,8 +162,8 @@ class RectanglePixelsRegion:
         self.x_start_point = self.left_down_point.x + self.block_x_length/2
         self.y_start_point = self.right_up_point.y - self.block_y_length/2
 
-        for row in range(0, self.__lastest_array.shape[1]):
-            for col in range(0, self.__lastest_array.shape[0]):
+        for row in range(self.__lastest_array.shape[1]):
+            for col in range(self.__lastest_array.shape[0]):
                 center_point = Point(self.x_start_point+col*self.block_x_length,self.y_start_point-row*self.block_y_length)
                 x_length = self.pixel_x_length * self.__lastest_array[col,row]
                 y_length = self.pixel_y_length * self.__lastest_array[col,row]
@@ -221,7 +224,9 @@ class RectanglePixelsRegion:
                 if (np.isclose(y_length, self.pixel_y_length) or y_length > self.pixel_y_length):
                     y_length = self.pixel_y_length
                 self.fdtd_engine.fdtd.eval(
-                    'select("{}");'.format(self.group_name + str(position[0]) + "_" + str(position[1])))
+                    f'select("{self.group_name + str(position[0]) + "_" + str(position[1])}");'
+                )
+
                 self.fdtd_engine.fdtd.eval('set("x span", {:.6f}e-6);'.format(x_length))
                 self.fdtd_engine.fdtd.eval('set("y span", {:.6f}e-6);'.format(y_length))
 

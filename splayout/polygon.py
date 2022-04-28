@@ -45,10 +45,7 @@ class Polygon:
             elif type(item) == tuple:
                 self.tuple_list.append(item)
                 self.point_list.append(Point(item[0],item[1]))
-            elif type(item) == list:
-                self.tuple_list.append(tuple(item))
-                self.point_list.append(Point(item[0], item[1]))
-            elif type(item) == np.ndarray:
+            elif type(item) in [list, np.ndarray]:
                 self.tuple_list.append(tuple(item))
                 self.point_list.append(Point(item[0], item[1]))
             else:
@@ -93,17 +90,16 @@ class Polygon:
         engine : FDTDSimulation or MODESimulation
             CAD to draw the component.
         """
-        if ((type(engine) == FDTDSimulation) or (type(engine) == MODESimulation)):
-            if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
-                engine.put_polygon(tuple_list = self.tuple_list,
-                                   z_start = self.z_start,
-                                   z_end = self.z_end,
-                                   material= self.material,
-                                   rename = self.rename)
-            else:
-                raise Exception("Z-axis specification or material specification is missing!")
-        else:
+        if type(engine) not in [FDTDSimulation, MODESimulation]:
             raise Exception("Wrong CAD engine!")
+        if (type(self.z_start) != type(None) and type(self.z_end) != type(None) and type(self.material) != type(None) ):
+            engine.put_polygon(tuple_list = self.tuple_list,
+                               z_start = self.z_start,
+                               z_end = self.z_end,
+                               material= self.material,
+                               rename = self.rename)
+        else:
+            raise Exception("Z-axis specification or material specification is missing!")
 
     def get_the_point_at_number(self,i):
         """

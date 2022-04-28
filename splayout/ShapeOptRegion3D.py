@@ -53,8 +53,8 @@ class ShapeOptRegion3D:
         self.z_start = z_start
         self.z_end = z_end
         self.rename = rename
-        self.index_region_name = self.rename + "_index"
-        self.field_region_name = self.rename + "_field"
+        self.index_region_name = f"{self.rename}_index"
+        self.field_region_name = f"{self.rename}_field"
         self.__initialize()
         self.epsilon_figure = None
         self.field_figure = None
@@ -83,8 +83,7 @@ class ShapeOptRegion3D:
         params : numpy.array
             A one-dimensional array in [0,1].
         """
-        self.fdtd_engine.fdtd.eval('select("{}");'.format(self.rename) +
-                                   'delete;')
+        self.fdtd_engine.fdtd.eval((f'select("{self.rename}");' + 'delete;'))
         self.transfer_function(params)
 
     def get_E_distribution(self, if_get_spatial = 0):
@@ -104,11 +103,10 @@ class ShapeOptRegion3D:
             if if_get_spatial == 1: field, x mesh, y mesh, z mesh
                 size: (x mesh, y mesh, z mesh, frequency points, 3), (x mesh,), (y mesh,), (z mesh,)
         """
-        if (if_get_spatial == 0):
-            self.field_figure = self.fdtd_engine.get_E_distribution(field_monitor_name = self.field_region_name, if_get_spatial = if_get_spatial)
-            return self.field_figure
-        else:
+        if if_get_spatial != 0:
             return self.fdtd_engine.get_E_distribution(field_monitor_name = self.field_region_name, if_get_spatial = if_get_spatial)
+        self.field_figure = self.fdtd_engine.get_E_distribution(field_monitor_name = self.field_region_name, if_get_spatial = if_get_spatial)
+        return self.field_figure
 
     def get_E_distribution_in_CAD(self, data_name):
         """
